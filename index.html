@@ -51,6 +51,14 @@ button{cursor:pointer}
 .notice{padding:12px;border-radius:12px;background:#eff6ff;color:#1d4ed8;font-size:13px;margin-bottom:12px}
 .pinbox{text-align:center}.pinbox input{text-align:center;letter-spacing:8px;font-size:22px}
 @media(max-width:560px){.stats{grid-template-columns:1fr}.formgrid,.filters{grid-template-columns:1fr}.full{grid-column:auto}.reportcards{grid-template-columns:1fr}.brand{font-size:19px}}
+
+.reportcards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.reporttable{width:100%;border-collapse:collapse;margin-top:8px}
+.reporttable th,.reporttable td{text-align:left;padding:10px 7px;border-bottom:1px solid #e5e7eb;font-size:13px}
+.reporttable th{color:#64748b;font-size:11px;text-transform:uppercase}
+.reporttable td:last-child,.reporttable th:last-child{text-align:right}
+.reportempty{text-align:center;color:#64748b;padding:22px 5px}
+
 </style>
 </head>
 <body>
@@ -110,16 +118,47 @@ button{cursor:pointer}
 <section id="reports" class="page">
  <div class="section">
   <div class="sectionhead"><h2>Reports</h2></div>
-  <div class="field"><label>Report Month</label><input type="month" id="reportMonth"></div>
-  <div class="reportcards">
-   <div class="reportcard"><small>Income</small><b class="income" id="rIncome">₹0.00</b></div>
-   <div class="reportcard"><small>Expense</small><b class="expense" id="rExpense">₹0.00</b></div>
-   <div class="reportcard"><small>Net</small><b id="rNet">₹0.00</b></div>
-   <div class="reportcard"><small>Transfers</small><b class="transfer" id="rTransfer">₹0.00</b></div>
+  <div class="tabs">
+   <button id="rtToday" onclick="setReportPeriod('today')">Today</button>
+   <button id="rtWeek" onclick="setReportPeriod('week')">Week</button>
+   <button id="rtMonth" onclick="setReportPeriod('month')">Month</button>
   </div>
-  <div style="margin-top:16px"><b>Income vs Expense</b><div class="bar in"><i id="inBar" style="width:0%"></i></div><div class="bar out"><i id="outBar" style="width:0%"></i></div></div>
+  <div class="formgrid">
+   <div class="field"><label>From Date</label><input type="date" id="rf"></div>
+   <div class="field"><label>To Date</label><input type="date" id="rt"></div>
+   <div class="field full"><label>Party / Account</label><input id="rp" placeholder="Optional party search"></div>
+   <div class="field"><label>Category / Head</label><select id="rc"></select></div>
+   <div class="field"><label>Mode</label><select id="rm"><option value="">All</option><option value="cash">Cash</option><option value="online">Online</option></select></div>
+  </div>
+  <button class="primary" style="width:100%;margin-bottom:12px" onclick="renderReportsV2()">Apply Report</button>
+  <div class="reportcards">
+   <div class="reportcard"><small>Total Income</small><b class="income" id="v2Income">₹0.00</b></div>
+   <div class="reportcard"><small>Total Expense</small><b class="expense" id="v2Expense">₹0.00</b></div>
+   <div class="reportcard"><small>Net</small><b id="v2Net">₹0.00</b></div>
+   <div class="reportcard"><small>Transfer</small><b class="transfer" id="v2Transfer">₹0.00</b></div>
+  </div>
  </div>
- <div class="section"><h2>Category-wise Expense</h2><div id="catReport"></div></div>
+ <div class="section">
+  <div class="sectionhead"><h2>Cash / Online</h2></div>
+  <div class="reportcards">
+   <div class="reportcard"><small>Cash Income</small><b class="income" id="v2CashIn">₹0.00</b></div>
+   <div class="reportcard"><small>Cash Expense</small><b class="expense" id="v2CashOut">₹0.00</b></div>
+   <div class="reportcard"><small>Online Income</small><b class="income" id="v2OnlineIn">₹0.00</b></div>
+   <div class="reportcard"><small>Online Expense</small><b class="expense" id="v2OnlineOut">₹0.00</b></div>
+  </div>
+ </div>
+ <div class="section">
+  <div class="sectionhead"><h2>Category-wise Expense</h2></div>
+  <div id="v2CategoryReport"></div>
+ </div>
+ <div class="section">
+  <div class="sectionhead"><h2>Party-wise Transactions</h2></div>
+  <div id="v2PartyReport"></div>
+ </div>
+ <div class="section">
+  <div class="sectionhead"><h2>Transaction Summary</h2><button class="secondary" onclick="exportReportCSV()">Export CSV</button></div>
+  <div id="v2ReportTable"></div>
+ </div>
 </section>
 
 <section id="masters" class="page">
@@ -337,6 +376,95 @@ function exportCSV(){
 function savePin(){const p=$('pinInput').value.trim();if(!/^\d{4}$/.test(p))return alert('Enter exactly 4 digits.');db.pin=p;save();$('pinInput').value='';alert('PIN saved.')}
 function removePin(){if(confirm('Remove App Lock?')){db.pin='';save();alert('PIN removed.')}} 
 function unlock(){if($('unlockPin').value===db.pin){$('pinModal').classList.remove('show');$('unlockPin').value=''}else alert('Wrong PIN.')}
+
+let reportPeriod='month';
+
+function setReportPeriod(p){
+ reportPeriod=p;
+ const now=new Date();
+ let f=today(), t=today();
+ if(p==='week'){
+  const d=new Date(now), day=d.getDay();
+  d.setDate(d.getDate()-(day===0?6:day-1));
+  f=d.toISOString().slice(0,10);
+ }else if(p==='month'){
+  f=new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10);
+ }
+ $('rf').value=f;$('rt').value=t;
+ document.querySelectorAll('#reports .tabs button').forEach(x=>x.classList.remove('active'));
+ const map={today:'rtToday',week:'rtWeek',month:'rtMonth'};
+ if($(map[p]))$(map[p]).classList.add('active');
+ renderReportsV2();
+}
+
+function reportFiltered(){
+ const f=$('rf').value,t=$('rt').value,party=$('rp').value.trim().toLowerCase(),cat=$('rc').value,mode=$('rm').value;
+ return db.entries.filter(e=>
+  (!f||e.date>=f)&&(!t||e.date<=t)&&
+  (!party||String(e.party||'').toLowerCase().includes(party))&&
+  (!cat||e.category===cat)&&
+  (!mode||(e.mode===mode||e.from===mode||e.to===mode))
+ );
+}
+
+function renderReportsV2(){
+ if(!$('rf'))return;
+ const list=reportFiltered();
+ let income=0,expense=0,transfer=0,cashIn=0,cashOut=0,onlineIn=0,onlineOut=0;
+ const cats={},parties={};
+ list.forEach(e=>{
+  if(e.type==='income'){
+   income+=+e.amount;
+   if(e.mode==='cash')cashIn+=+e.amount;else onlineIn+=+e.amount;
+  }else if(e.type==='expense'){
+   expense+=+e.amount;
+   if(e.mode==='cash')cashOut+=+e.amount;else onlineOut+=+e.amount;
+   const c=e.category||'Uncategorized';cats[c]=(cats[c]||0)+ +e.amount;
+  }else transfer+=+e.amount;
+  const p=e.party||'No Party / Account';parties[p]=(parties[p]||0)+ +e.amount;
+ });
+ $('v2Income').textContent=money(income);$('v2Expense').textContent=money(expense);
+ $('v2Net').textContent=money(income-expense);$('v2Transfer').textContent=money(transfer);
+ $('v2CashIn').textContent=money(cashIn);$('v2CashOut').textContent=money(cashOut);
+ $('v2OnlineIn').textContent=money(onlineIn);$('v2OnlineOut').textContent=money(onlineOut);
+
+ const ca=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+ $('v2CategoryReport').innerHTML=ca.length?
+ `<table class="reporttable"><tr><th>Category / Head</th><th>Expense</th></tr>`+
+ ca.map(x=>`<tr><td>${esc(x[0])}</td><td class="expense">${money(x[1])}</td></tr>`).join('')+
+ `</table>`:`<div class="reportempty">No expense data for this period.</div>`;
+
+ const pa=Object.entries(parties).sort((a,b)=>b[1]-a[1]);
+ $('v2PartyReport').innerHTML=pa.length?
+ `<table class="reporttable"><tr><th>Party / Account</th><th>Total</th></tr>`+
+ pa.map(x=>`<tr><td>${esc(x[0])}</td><td>${money(x[1])}</td></tr>`).join('')+
+ `</table>`:`<div class="reportempty">No party data for this period.</div>`;
+
+ $('v2ReportTable').innerHTML=list.length?
+ `<table class="reporttable"><tr><th>Date</th><th>Type</th><th>Party</th><th>Amount</th></tr>`+
+ [...list].sort((a,b)=>b.id-a.id).map(e=>`<tr><td>${esc(e.date)}</td><td>${esc(e.type)}</td><td>${esc(e.party||'—')}</td><td>${money(e.amount)}</td></tr>`).join('')+
+ `</table>`:`<div class="reportempty">No transactions found.</div>`;
+}
+
+function exportReportCSV(){
+ const list=reportFiltered();
+ if(!list.length)return alert('No report data to export.');
+ const rows=[['Date','Type','Party/Account','Amount','Mode','From','To','Category/Head','Reference','Note']];
+ list.forEach(e=>rows.push([e.date,e.type,e.party||'',e.amount,e.mode||'',e.from||'',e.to||'',e.category||'',e.ref||'',e.note||'']));
+ const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+ a.download='money-report-'+today()+'.csv';a.click();
+}
+
+const _openPage=openPage;
+openPage=function(id){
+ _openPage(id);
+ if(id==='reports'){
+  $('rc').innerHTML='<option value="">All</option>'+visibleCats().map(c=>`<option>${esc(c)}</option>`).join('');
+  if(!$('rf').value)setReportPeriod('month');else renderReportsV2();
+ }
+};
+
 init();
 </script>
 </body>
