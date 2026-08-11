@@ -2,798 +2,342 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0f172a">
-<title>Daily Money Manager</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#0b1324">
+<title>Daily Money Manager V2</title>
 <style>
-* {
-    box-sizing: border-box;
+:root{
+ --navy:#0b1324;--navy2:#17223a;--green:#16a34a;--green2:#22c55e;
+ --blue:#2563eb;--red:#dc2626;--orange:#f59e0b;--bg:#eef2f7;
+ --card:rgba(255,255,255,.94);--text:#172033;--muted:#64748b;
+ --shadow:0 10px 28px rgba(15,23,42,.12);--radius:20px
 }
-
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f1f5f9;
-    color: #0f172a;
-}
-
-header {
-    background: #0f172a;
-    color: white;
-    padding: 18px 16px;
-    text-align: center;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 22px;
-}
-
-header p {
-    margin: 5px 0 0;
-    font-size: 13px;
-    opacity: .8;
-}
-
-.container {
-    max-width: 700px;
-    margin: auto;
-    padding: 15px;
-}
-
-.balance-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 15px;
-}
-
-.balance-card {
-    background: white;
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
-}
-
-.balance-card h3 {
-    margin: 0 0 8px;
-    font-size: 14px;
-    color: #64748b;
-}
-
-.balance-card .amount {
-    font-size: 24px;
-    font-weight: bold;
-}
-
-.cash {
-    color: #15803d;
-}
-
-.online {
-    color: #2563eb;
-}
-
-.total-card {
-    background: #16a34a;
-    color: white;
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 15px;
-}
-
-.total-card h3 {
-    margin: 0 0 8px;
-    font-size: 14px;
-}
-
-.total-card .amount {
-    font-size: 30px;
-    font-weight: bold;
-}
-
-.card {
-    background: white;
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
-}
-
-.card h2 {
-    margin-top: 0;
-    font-size: 18px;
-}
-
-.tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 15px;
-}
-
-.tabs button {
-    flex: 1;
-    border: none;
-    padding: 12px;
-    border-radius: 9px;
-    background: #e2e8f0;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.tabs button.active {
-    background: #0f172a;
-    color: white;
-}
-
-.form-group {
-    margin-bottom: 12px;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 13px;
-    font-weight: bold;
-}
-
-input, select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 9px;
-    font-size: 15px;
-    outline: none;
-}
-
-input:focus, select:focus {
-    border-color: #2563eb;
-}
-
-.primary-btn {
-    width: 100%;
-    border: none;
-    padding: 13px;
-    border-radius: 9px;
-    background: #16a34a;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.transfer-btn {
-    background: #2563eb;
-}
-
-.summary {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.summary-box {
-    padding: 14px;
-    border-radius: 10px;
-    background: #f8fafc;
-}
-
-.summary-box small {
-    color: #64748b;
-}
-
-.summary-box strong {
-    display: block;
-    margin-top: 5px;
-    font-size: 20px;
-}
-
-.income-text {
-    color: #16a34a;
-}
-
-.expense-text {
-    color: #dc2626;
-}
-
-.history-item {
-    border-bottom: 1px solid #e2e8f0;
-    padding: 13px 0;
-}
-
-.history-item:last-child {
-    border-bottom: none;
-}
-
-.history-top {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.history-title {
-    font-weight: bold;
-}
-
-.history-date {
-    color: #64748b;
-    font-size: 12px;
-    margin-top: 4px;
-}
-
-.history-amount {
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.delete-btn {
-    margin-top: 8px;
-    border: none;
-    background: #fee2e2;
-    color: #dc2626;
-    padding: 6px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.empty {
-    text-align: center;
-    color: #64748b;
-    padding: 25px 10px;
-}
-
-.hidden {
-    display: none;
-}
-
-.footer {
-    text-align: center;
-    color: #64748b;
-    font-size: 12px;
-    padding: 20px;
-}
-
-@media (max-width: 500px) {
-    .balance-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .balance-card .amount {
-        font-size: 20px;
-    }
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(145deg,#eef2f7,#e2e8f0);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:900px;margin:auto;min-height:100vh;padding-bottom:88px}
+.topbar{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:18px 18px 22px;position:sticky;top:0;z-index:20;box-shadow:0 8px 24px rgba(11,19,36,.2)}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-size:22px;font-weight:800}.subtitle{font-size:12px;opacity:.75;margin-top:3px}
+.iconbtn{border:0;background:rgba(255,255,255,.12);color:#fff;width:42px;height:42px;border-radius:13px}
+.content{padding:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.balance{background:var(--card);border-radius:var(--radius);padding:17px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.balance:after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;right:-35px;top:-40px;background:rgba(37,99,235,.08)}
+.balance h4{margin:0;color:var(--muted);font-size:13px}.balance .value{font-size:25px;font-weight:850;margin-top:8px}.cash .value{color:var(--green)}.online .value{color:var(--blue)}
+.total{margin-top:12px;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;border-radius:var(--radius);padding:20px;box-shadow:0 14px 30px rgba(22,163,74,.22)}
+.total small{opacity:.85}.total .value{font-size:32px;font-weight:900;margin-top:5px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.stat{background:var(--card);border-radius:17px;padding:14px;box-shadow:var(--shadow)}.stat small{color:var(--muted)}.stat b{display:block;margin-top:6px;font-size:18px}.income{color:var(--green)}.expense{color:var(--red)}.transfer{color:var(--blue)}
+.section{background:var(--card);border-radius:var(--radius);padding:17px;margin-top:15px;box-shadow:var(--shadow)}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.section h2{font-size:18px;margin:0}
+.primary,.secondary,.danger{border:0;border-radius:12px;padding:11px 15px;font-weight:750}.primary{background:var(--green);color:#fff}.secondary{background:#e8eef7;color:var(--navy)}.danger{background:#fee2e2;color:var(--red)}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.quick button{border:0;border-radius:15px;padding:15px;background:#f8fafc;box-shadow:inset 0 0 0 1px #e2e8f0;font-weight:800}
+.quick .qinc{color:var(--green)}.quick .qexp{color:var(--red)}.quick .qtr{color:var(--blue)}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(900px,100%);background:rgba(255,255,255,.96);backdrop-filter:blur(12px);display:grid;grid-template-columns:repeat(5,1fr);padding:9px 8px calc(9px + env(safe-area-inset-bottom));box-shadow:0 -8px 25px rgba(15,23,42,.12);z-index:30}
+.bottom button{border:0;background:none;color:#64748b;font-size:11px;font-weight:700;padding:6px 2px}.bottom button span{display:block;font-size:21px;margin-bottom:2px}.bottom button.active{color:var(--green)}
+.page{display:none}.page.active{display:block}
+.field{margin-bottom:12px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid #d7dee8;background:#fff;border-radius:12px;padding:12px;outline:none}.field textarea{min-height:80px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}
+.listitem{border-bottom:1px solid #e5e7eb;padding:13px 0}.listitem:last-child{border-bottom:0}.itemtop{display:flex;justify-content:space-between;gap:10px}.itemtitle{font-weight:800}.meta{font-size:12px;color:var(--muted);margin-top:4px}.amount{font-weight:900;white-space:nowrap}.empty{text-align:center;color:var(--muted);padding:28px 8px}
+.chip{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;background:#eef2ff;color:#4338ca;margin-top:5px}
+.filters{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.filters .wide{grid-column:1/-1}
+.modal{position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;align-items:flex-end;justify-content:center;z-index:100;padding:12px}.modal.show{display:flex}.sheet{background:#fff;width:min(700px,100%);max-height:92vh;overflow:auto;border-radius:24px 24px 15px 15px;padding:18px;box-shadow:0 25px 60px rgba(0,0,0,.25)}.sheethead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.close{border:0;background:#eef2f7;border-radius:10px;width:38px;height:38px;font-size:20px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}.tabs button{border:0;background:#e8eef7;padding:11px;border-radius:10px;font-weight:800}.tabs button.active{background:var(--navy);color:#fff}
+.masterrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0;border-bottom:1px solid #e5e7eb}.mastername{font-weight:750}.actions{display:flex;gap:6px}.actions button{border:0;border-radius:8px;padding:7px 9px;background:#eef2f7}
+.reportcards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.reportcard{padding:15px;border-radius:15px;background:#f8fafc}.reportcard small{color:var(--muted)}.reportcard b{display:block;font-size:21px;margin-top:6px}
+.bar{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;border-radius:999px}.bar.in i{background:var(--green)}.bar.out i{background:var(--red)}
+.notice{padding:12px;border-radius:12px;background:#eff6ff;color:#1d4ed8;font-size:13px;margin-bottom:12px}
+.pinbox{text-align:center}.pinbox input{text-align:center;letter-spacing:8px;font-size:22px}
+@media(max-width:560px){.stats{grid-template-columns:1fr}.formgrid,.filters{grid-template-columns:1fr}.full{grid-column:auto}.reportcards{grid-template-columns:1fr}.brand{font-size:19px}}
 </style>
 </head>
-
 <body>
-
-<header>
-    <h1>Daily Money Manager</h1>
-    <p>Income • Expense • Cash • Online</p>
+<div class="app">
+<header class="topbar">
+ <div class="toprow">
+  <div><div class="brand">Daily Money Manager</div><div class="subtitle">Income • Expense • Cash • Online</div></div>
+  <button class="iconbtn" onclick="openPage('more')">⚙️</button>
+ </div>
 </header>
 
-<div class="container">
+<main class="content">
+<section id="home" class="page active">
+ <div class="grid2">
+  <div class="balance cash"><h4>Cash Balance</h4><div class="value" id="cashBal">₹0.00</div></div>
+  <div class="balance online"><h4>Online Balance</h4><div class="value" id="onlineBal">₹0.00</div></div>
+ </div>
+ <div class="total"><small>Total Balance</small><div class="value" id="totalBal">₹0.00</div></div>
+ <div class="stats">
+  <div class="stat"><small>Today Income</small><b class="income" id="todayIncome">₹0.00</b></div>
+  <div class="stat"><small>Today Expense</small><b class="expense" id="todayExpense">₹0.00</b></div>
+  <div class="stat"><small>Today Transfer</small><b class="transfer" id="todayTransfer">₹0.00</b></div>
+ </div>
+ <div class="section">
+  <div class="sectionhead"><h2>Quick Add</h2></div>
+  <div class="quick">
+   <button class="qinc" onclick="openEntry('income')">＋ Income</button>
+   <button class="qexp" onclick="openEntry('expense')">＋ Expense</button>
+   <button class="qtr" onclick="openEntry('transfer')">⇄ Transfer</button>
+  </div>
+ </div>
+ <div class="section">
+  <div class="sectionhead"><h2>This Month</h2><button class="secondary" onclick="openPage('reports')">View Report</button></div>
+  <div class="reportcards">
+   <div class="reportcard"><small>Income</small><b class="income" id="monthIncome">₹0.00</b></div>
+   <div class="reportcard"><small>Expense</small><b class="expense" id="monthExpense">₹0.00</b></div>
+  </div>
+ </div>
+</section>
 
-    <!-- BALANCE -->
-    <div class="balance-grid">
-        <div class="balance-card">
-            <h3>Cash Balance</h3>
-            <div class="amount cash" id="cashBalance">₹0.00</div>
-        </div>
+<section id="history" class="page">
+ <div class="section">
+  <div class="sectionhead"><h2>Transaction History</h2><button class="primary" onclick="openEntry('income')">＋ Add</button></div>
+  <div class="filters">
+   <div class="field"><label>From Date</label><input type="date" id="hf"></div>
+   <div class="field"><label>To Date</label><input type="date" id="ht"></div>
+   <div class="field"><label>Type</label><select id="htype"><option value="">All</option><option>income</option><option>expense</option><option>transfer</option></select></div>
+   <div class="field"><label>Mode</label><select id="hmode"><option value="">All</option><option>cash</option><option>online</option></select></div>
+   <div class="field wide"><label>Party / Account</label><input id="hparty" placeholder="Search party name"></div>
+   <div class="field wide"><label>Category / Head</label><select id="hcat"></select></div>
+  </div>
+  <button class="secondary" onclick="renderHistory()">Apply Filter</button>
+  <div id="historyList"></div>
+ </div>
+</section>
 
-        <div class="balance-card">
-            <h3>Online Balance</h3>
-            <div class="amount online" id="onlineBalance">₹0.00</div>
-        </div>
-    </div>
+<section id="reports" class="page">
+ <div class="section">
+  <div class="sectionhead"><h2>Reports</h2></div>
+  <div class="field"><label>Report Month</label><input type="month" id="reportMonth"></div>
+  <div class="reportcards">
+   <div class="reportcard"><small>Income</small><b class="income" id="rIncome">₹0.00</b></div>
+   <div class="reportcard"><small>Expense</small><b class="expense" id="rExpense">₹0.00</b></div>
+   <div class="reportcard"><small>Net</small><b id="rNet">₹0.00</b></div>
+   <div class="reportcard"><small>Transfers</small><b class="transfer" id="rTransfer">₹0.00</b></div>
+  </div>
+  <div style="margin-top:16px"><b>Income vs Expense</b><div class="bar in"><i id="inBar" style="width:0%"></i></div><div class="bar out"><i id="outBar" style="width:0%"></i></div></div>
+ </div>
+ <div class="section"><h2>Category-wise Expense</h2><div id="catReport"></div></div>
+</section>
 
-    <div class="total-card">
-        <h3>Total Balance</h3>
-        <div class="amount" id="totalBalance">₹0.00</div>
-    </div>
+<section id="masters" class="page">
+ <div class="section">
+  <div class="sectionhead"><h2>Party Master</h2><button class="primary" onclick="addParty()">＋ Add</button></div>
+  <div id="partyMaster"></div>
+ </div>
+ <div class="section">
+  <div class="sectionhead"><h2>Category / Head Master</h2><button class="primary" onclick="addCategory()">＋ Add</button></div>
+  <div class="notice">আপনি নিজের প্রয়োজন অনুযায়ী Category / Head Add, Edit, Hide এবং Delete করতে পারবেন।</div>
+  <div id="categoryMaster"></div>
+ </div>
+</section>
 
-    <!-- ENTRY -->
-    <div class="card">
-        <div class="tabs">
-            <button id="incomeTab" class="active" onclick="setType('income')">
-                Income
-            </button>
+<section id="more" class="page">
+ <div class="section">
+  <div class="sectionhead"><h2>Settings</h2></div>
+  <div class="notice">এই app-এর data এখন এই browser/device-এ localভাবে save হয়। Backup নিয়মিত নিন।</div>
+  <div class="field"><label>Opening Date</label><input type="date" id="openDate"></div>
+  <div class="formgrid">
+   <div class="field"><label>Opening Cash</label><input type="number" id="openCash" step="0.01"></div>
+   <div class="field"><label>Opening Online</label><input type="number" id="openOnline" step="0.01"></div>
+  </div>
+  <button class="primary" onclick="saveOpening()">Save Opening Balance</button>
+ </div>
+ <div class="section">
+  <div class="sectionhead"><h2>Backup & Restore</h2></div>
+  <button class="primary" onclick="backupData()">⬇ Backup Data</button>
+  <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreData(event)">
+  <button class="secondary" onclick="document.getElementById('restoreFile').click()">⬆ Restore Data</button>
+  <button class="secondary" onclick="exportCSV()">Export CSV</button>
+ </div>
+ <div class="section">
+  <div class="sectionhead"><h2>App Lock</h2></div>
+  <div class="field"><label>4-digit PIN (optional)</label><input id="pinInput" type="password" inputmode="numeric" maxlength="4" placeholder="Enter 4 digit PIN"></div>
+  <button class="primary" onclick="savePin()">Save / Change PIN</button>
+  <button class="danger" onclick="removePin()">Remove PIN</button>
+ </div>
+</section>
+</main>
 
-            <button id="expenseTab" onclick="setType('expense')">
-                Expense
-            </button>
-
-            <button id="transferTab" onclick="setType('transfer')">
-                Transfer
-            </button>
-        </div>
-
-        <!-- Income / Expense Form -->
-        <div id="normalForm">
-
-            <div class="form-group">
-                <label>Date</label>
-                <input type="date" id="date">
-            </div>
-
-            <div class="form-group">
-                <label>Amount</label>
-                <input type="number" id="amount" placeholder="Enter amount" step="0.01">
-            </div>
-
-            <div class="form-group">
-                <label>Mode</label>
-                <select id="mode">
-                    <option value="cash">Cash</option>
-                    <option value="online">Online</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Category / Head</label>
-                <input type="text" id="category" placeholder="Example: Sale, Labour, Food">
-            </div>
-
-            <div class="form-group">
-                <label>Note</label>
-                <input type="text" id="note" placeholder="Optional">
-            </div>
-
-            <button class="primary-btn" onclick="addEntry()">
-                Add Entry
-            </button>
-        </div>
-
-        <!-- Transfer Form -->
-        <div id="transferForm" class="hidden">
-
-            <div class="form-group">
-                <label>Date</label>
-                <input type="date" id="transferDate">
-            </div>
-
-            <div class="form-group">
-                <label>Amount</label>
-                <input type="number" id="transferAmount" placeholder="Enter amount">
-            </div>
-
-            <div class="form-group">
-                <label>From</label>
-                <select id="fromMode">
-                    <option value="cash">Cash</option>
-                    <option value="online">Online</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>To</label>
-                <select id="toMode">
-                    <option value="online">Online</option>
-                    <option value="cash">Cash</option>
-                </select>
-            </div>
-
-            <button class="primary-btn transfer-btn" onclick="addTransfer()">
-                Transfer Money
-            </button>
-        </div>
-    </div>
-
-    <!-- SUMMARY -->
-    <div class="card">
-        <h2>Summary</h2>
-
-        <div class="summary">
-            <div class="summary-box">
-                <small>Total Income</small>
-                <strong class="income-text" id="totalIncome">₹0.00</strong>
-            </div>
-
-            <div class="summary-box">
-                <small>Total Expense</small>
-                <strong class="expense-text" id="totalExpense">₹0.00</strong>
-            </div>
-        </div>
-    </div>
-
-    <!-- HISTORY -->
-    <div class="card">
-        <h2>History</h2>
-
-        <div class="form-group">
-            <label>Filter Date</label>
-            <input type="date" id="filterDate" onchange="renderHistory()">
-        </div>
-
-        <div id="history"></div>
-    </div>
-
+<nav class="bottom">
+ <button class="active" data-page="home" onclick="openPage('home')"><span>🏠</span>Home</button>
+ <button data-page="history" onclick="openPage('history')"><span>📋</span>History</button>
+ <button data-page="reports" onclick="openPage('reports')"><span>📊</span>Reports</button>
+ <button data-page="masters" onclick="openPage('masters')"><span>👥</span>Masters</button>
+ <button data-page="more" onclick="openPage('more')"><span>⚙️</span>More</button>
+</nav>
 </div>
 
-<div class="footer">
-    Daily Money Manager
+<div class="modal" id="entryModal">
+ <div class="sheet">
+  <div class="sheethead"><h2 id="entryTitle">Add Income</h2><button class="close" onclick="closeModal()">×</button></div>
+  <div class="tabs">
+   <button id="tabIncome" onclick="setEntryType('income')">Income</button>
+   <button id="tabExpense" onclick="setEntryType('expense')">Expense</button>
+   <button id="tabTransfer" onclick="setEntryType('transfer')">Transfer</button>
+  </div>
+  <div id="normalEntry">
+   <div class="formgrid">
+    <div class="field"><label>Date</label><input type="date" id="eDate"></div>
+    <div class="field"><label>Amount</label><input type="number" id="eAmount" step="0.01" placeholder="0.00"></div>
+    <div class="field"><label>Party Name</label><input id="eParty" list="partyOptions" placeholder="Party / person / account"></div>
+    <div class="field"><label>Mode</label><select id="eMode"><option value="cash">Cash</option><option value="online">Online</option></select></div>
+    <div class="field"><label>Category / Head</label><select id="eCat"></select></div>
+    <div class="field"><label>Reference No.</label><input id="eRef" placeholder="Optional"></div>
+    <div class="field full"><label>Note / Remarks</label><textarea id="eNote" placeholder="Optional note"></textarea></div>
+   </div>
+  </div>
+  <div id="transferEntry" style="display:none">
+   <div class="formgrid">
+    <div class="field"><label>Date</label><input type="date" id="tDate"></div>
+    <div class="field"><label>Amount</label><input type="number" id="tAmount" step="0.01" placeholder="0.00"></div>
+    <div class="field"><label>Party / Account Name</label><input id="tParty" list="partyOptions" placeholder="Bank / account / party"></div>
+    <div class="field"><label>From</label><select id="tFrom"><option value="cash">Cash</option><option value="online">Online</option></select></div>
+    <div class="field"><label>To</label><select id="tTo"><option value="online">Online</option><option value="cash">Cash</option></select></div>
+    <div class="field"><label>Reference No.</label><input id="tRef" placeholder="Optional"></div>
+    <div class="field full"><label>Note / Remarks</label><textarea id="tNote" placeholder="Optional note"></textarea></div>
+   </div>
+  </div>
+  <button class="primary" style="width:100%;margin-top:5px" onclick="saveEntry()">Save Entry</button>
+ </div>
+</div>
+<datalist id="partyOptions"></datalist>
+
+<div class="modal" id="pinModal">
+ <div class="sheet pinbox">
+  <h2>🔐 App Locked</h2><p>Enter your 4-digit PIN</p>
+  <input id="unlockPin" type="password" inputmode="numeric" maxlength="4">
+  <button class="primary" style="width:100%;margin-top:15px" onclick="unlock()">Unlock</button>
+ </div>
 </div>
 
 <script>
+const KEY='dmm_v2_data';
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||{
+ entries:[], parties:[], categories:[
+  'Sales','Purchase','Labour','Transport','Food','Fuel','Electricity','Business','Personal','Other'
+ ], hiddenCategories:[], opening:{date:'',cash:0,online:0}, pin:''
+};
+let entryType='income';
 
-let entries = JSON.parse(localStorage.getItem("moneyEntries")) || [];
-
-let currentType = "income";
-
-const today = new Date().toISOString().split("T")[0];
-
-document.getElementById("date").value = today;
-document.getElementById("transferDate").value = today;
-
-
-/* -------------------------
-   TYPE
-------------------------- */
-
-function setType(type) {
-
-    currentType = type;
-
-    document.getElementById("incomeTab").classList.remove("active");
-    document.getElementById("expenseTab").classList.remove("active");
-    document.getElementById("transferTab").classList.remove("active");
-
-    document.getElementById(type + "Tab").classList.add("active");
-
-    if (type === "transfer") {
-
-        document.getElementById("normalForm").classList.add("hidden");
-        document.getElementById("transferForm").classList.remove("hidden");
-
-    } else {
-
-        document.getElementById("normalForm").classList.remove("hidden");
-        document.getElementById("transferForm").classList.add("hidden");
-    }
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().slice(0,10);
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function openPage(id){
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+ $(id).classList.add('active');
+ document.querySelectorAll('.bottom button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));
+ if(id==='history')renderHistory(); if(id==='reports')renderReports(); if(id==='masters')renderMasters();
+ window.scrollTo({top:0,behavior:'smooth'});
 }
-
-
-/* -------------------------
-   ADD INCOME / EXPENSE
-------------------------- */
-
-function addEntry() {
-
-    const date = document.getElementById("date").value;
-    const amount = parseFloat(document.getElementById("amount").value);
-    const mode = document.getElementById("mode").value;
-    const category = document.getElementById("category").value.trim();
-    const note = document.getElementById("note").value.trim();
-
-    if (!date) {
-        alert("Please select date.");
-        return;
-    }
-
-    if (!amount || amount <= 0) {
-        alert("Please enter a valid amount.");
-        return;
-    }
-
-    entries.push({
-        id: Date.now(),
-        type: currentType,
-        date: date,
-        amount: amount,
-        mode: mode,
-        category: category || "General",
-        note: note
-    });
-
-    saveData();
-
-    document.getElementById("amount").value = "";
-    document.getElementById("category").value = "";
-    document.getElementById("note").value = "";
-
-    updateDashboard();
-
-    alert(
-        currentType === "income"
-        ? "Income added successfully."
-        : "Expense added successfully."
-    );
+function visibleCats(){return db.categories.filter(c=>!db.hiddenCategories.includes(c))}
+function fillCategories(){
+ const opts=visibleCats().map(c=>`<option>${esc(c)}</option>`).join('');
+ $('eCat').innerHTML=opts||'<option>Other</option>';
+ $('hcat').innerHTML='<option value="">All</option>'+opts;
 }
-
-
-/* -------------------------
-   TRANSFER
-------------------------- */
-
-function addTransfer() {
-
-    const date = document.getElementById("transferDate").value;
-    const amount = parseFloat(
-        document.getElementById("transferAmount").value
-    );
-
-    const from = document.getElementById("fromMode").value;
-    const to = document.getElementById("toMode").value;
-
-    if (!amount || amount <= 0) {
-        alert("Please enter a valid amount.");
-        return;
-    }
-
-    if (from === to) {
-        alert("From and To cannot be same.");
-        return;
-    }
-
-    entries.push({
-        id: Date.now(),
-        type: "transfer",
-        date: date,
-        amount: amount,
-        from: from,
-        to: to
-    });
-
-    saveData();
-
-    document.getElementById("transferAmount").value = "";
-
-    updateDashboard();
-
-    alert("Transfer completed.");
+function fillParties(){
+ $('partyOptions').innerHTML=db.parties.map(p=>`<option value="${esc(p)}">`).join('');
 }
-
-
-/* -------------------------
-   SAVE
-------------------------- */
-
-function saveData() {
-    localStorage.setItem("moneyEntries", JSON.stringify(entries));
+function init(){
+ $('eDate').value=today();$('tDate').value=today();$('reportMonth').value=today().slice(0,7);$('openDate').value=db.opening.date||today();
+ $('openCash').value=db.opening.cash||0;$('openOnline').value=db.opening.online||0;
+ fillCategories();fillParties();updateDashboard();renderHistory();renderMasters();
+ if(db.pin)setTimeout(()=>$('pinModal').classList.add('show'),100);
 }
-
-
-/* -------------------------
-   CALCULATE BALANCE
-------------------------- */
-
-function calculateBalances() {
-
-    let cash = 0;
-    let online = 0;
-
-    let income = 0;
-    let expense = 0;
-
-    entries.forEach(entry => {
-
-        if (entry.type === "income") {
-
-            if (entry.mode === "cash") {
-                cash += entry.amount;
-            } else {
-                online += entry.amount;
-            }
-
-            income += entry.amount;
-        }
-
-        if (entry.type === "expense") {
-
-            if (entry.mode === "cash") {
-                cash -= entry.amount;
-            } else {
-                online -= entry.amount;
-            }
-
-            expense += entry.amount;
-        }
-
-        if (entry.type === "transfer") {
-
-            if (entry.from === "cash") {
-                cash -= entry.amount;
-            } else {
-                online -= entry.amount;
-            }
-
-            if (entry.to === "cash") {
-                cash += entry.amount;
-            } else {
-                online += entry.amount;
-            }
-        }
-    });
-
-    return {
-        cash,
-        online,
-        total: cash + online,
-        income,
-        expense
-    };
+function totals(){
+ let cash=Number(db.opening.cash)||0,online=Number(db.opening.online)||0,income=0,expense=0;
+ db.entries.forEach(e=>{
+  if(e.type==='income'){e.mode==='cash'?cash+=+e.amount:online+=+e.amount;income+=+e.amount}
+  if(e.type==='expense'){e.mode==='cash'?cash-=+e.amount:online-=+e.amount;expense+=+e.amount}
+  if(e.type==='transfer'){e.from==='cash'?cash-=+e.amount:online-=+e.amount;e.to==='cash'?cash+=+e.amount:online+=+e.amount}
+ });
+ return {cash,online,total:cash+online,income,expense};
 }
-
-
-/* -------------------------
-   DASHBOARD
-------------------------- */
-
-function updateDashboard() {
-
-    const data = calculateBalances();
-
-    document.getElementById("cashBalance").textContent =
-        formatMoney(data.cash);
-
-    document.getElementById("onlineBalance").textContent =
-        formatMoney(data.online);
-
-    document.getElementById("totalBalance").textContent =
-        formatMoney(data.total);
-
-    document.getElementById("totalIncome").textContent =
-        formatMoney(data.income);
-
-    document.getElementById("totalExpense").textContent =
-        formatMoney(data.expense);
-
-    renderHistory();
+function daySum(type,date=today()){
+ return db.entries.filter(e=>e.type===type&&e.date===date).reduce((s,e)=>s+Number(e.amount),0);
 }
-
-
-/* -------------------------
-   HISTORY
-------------------------- */
-
-function renderHistory() {
-
-    const container = document.getElementById("history");
-
-    const filterDate =
-        document.getElementById("filterDate").value;
-
-    let list = [...entries];
-
-    if (filterDate) {
-        list = list.filter(item => item.date === filterDate);
-    }
-
-    list.sort((a,b) => {
-        return b.id - a.id;
-    });
-
-    if (list.length === 0) {
-        container.innerHTML =
-            '<div class="empty">No entries found.</div>';
-        return;
-    }
-
-    container.innerHTML = "";
-
-    list.forEach(entry => {
-
-        const div = document.createElement("div");
-        div.className = "history-item";
-
-        let title = "";
-        let amountText = "";
-        let amountClass = "";
-
-        if (entry.type === "income") {
-
-            title =
-                "Income • " +
-                (entry.category || "General") +
-                " • " +
-                capitalize(entry.mode);
-
-            amountText = "+ " + formatMoney(entry.amount);
-            amountClass = "income-text";
-
-        } else if (entry.type === "expense") {
-
-            title =
-                "Expense • " +
-                (entry.category || "General") +
-                " • " +
-                capitalize(entry.mode);
-
-            amountText = "- " + formatMoney(entry.amount);
-            amountClass = "expense-text";
-
-        } else {
-
-            title =
-                "Transfer • " +
-                capitalize(entry.from) +
-                " → " +
-                capitalize(entry.to);
-
-            amountText = formatMoney(entry.amount);
-            amountClass = "online";
-        }
-
-        div.innerHTML = `
-            <div class="history-top">
-                <div>
-                    <div class="history-title">${escapeHTML(title)}</div>
-                    <div class="history-date">
-                        ${entry.date}
-                        ${entry.note ? " • " + escapeHTML(entry.note) : ""}
-                    </div>
-                </div>
-
-                <div class="history-amount ${amountClass}">
-                    ${amountText}
-                </div>
-            </div>
-
-            <button class="delete-btn"
-                onclick="deleteEntry(${entry.id})">
-                Delete
-            </button>
-        `;
-
-        container.appendChild(div);
-    });
+function monthSum(type,ym){
+ return db.entries.filter(e=>e.type===type&&e.date.startsWith(ym)).reduce((s,e)=>s+Number(e.amount),0);
 }
-
-
-/* -------------------------
-   DELETE
-------------------------- */
-
-function deleteEntry(id) {
-
-    const ok = confirm("Delete this entry?");
-
-    if (!ok) return;
-
-    entries = entries.filter(entry => entry.id !== id);
-
-    saveData();
-
-    updateDashboard();
+function updateDashboard(){
+ const t=totals();$('cashBal').textContent=money(t.cash);$('onlineBal').textContent=money(t.online);$('totalBal').textContent=money(t.total);
+ $('todayIncome').textContent=money(daySum('income'));$('todayExpense').textContent=money(daySum('expense'));$('todayTransfer').textContent=money(daySum('transfer'));
+ const ym=today().slice(0,7);$('monthIncome').textContent=money(monthSum('income',ym));$('monthExpense').textContent=money(monthSum('expense',ym));
 }
-
-
-/* -------------------------
-   HELPERS
-------------------------- */
-
-function formatMoney(value) {
-
-    return "₹" + Number(value).toLocaleString("en-IN", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
+function openEntry(type){entryType=type;setEntryType(type);$('entryModal').classList.add('show')}
+function closeModal(){$('entryModal').classList.remove('show')}
+function setEntryType(type){
+ entryType=type;$('tabIncome').classList.toggle('active',type==='income');$('tabExpense').classList.toggle('active',type==='expense');$('tabTransfer').classList.toggle('active',type==='transfer');
+ $('entryTitle').textContent=type==='income'?'Add Income':type==='expense'?'Add Expense':'Add Transfer';
+ $('normalEntry').style.display=type==='transfer'?'none':'block';$('transferEntry').style.display=type==='transfer'?'block':'none';
 }
-
-function capitalize(text) {
-
-    return text.charAt(0).toUpperCase() + text.slice(1);
+function saveEntry(){
+ if(entryType==='transfer'){
+  const amount=+$('tAmount').value;if(!amount||amount<=0)return alert('Enter a valid amount.');
+  if($('tFrom').value===$('tTo').value)return alert('From and To cannot be same.');
+  db.entries.push({id:Date.now(),type:'transfer',date:$('tDate').value||today(),amount,party:$('tParty').value.trim(),from:$('tFrom').value,to:$('tTo').value,ref:$('tRef').value.trim(),note:$('tNote').value.trim()});
+ }else{
+  const amount=+$('eAmount').value;if(!amount||amount<=0)return alert('Enter a valid amount.');
+  db.entries.push({id:Date.now(),type:entryType,date:$('eDate').value||today(),amount,party:$('eParty').value.trim(),mode:$('eMode').value,category:$('eCat').value,ref:$('eRef').value.trim(),note:$('eNote').value.trim()});
+ }
+ save();updateDashboard();renderHistory();closeModal();
+ ['eAmount','eParty','eRef','eNote','tAmount','tParty','tRef','tNote'].forEach(id=>$(id).value='');
 }
-
-function escapeHTML(text) {
-
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+function renderHistory(){
+ const f=$('hf').value,t=$('ht').value,type=$('htype').value,mode=$('hmode').value,party=$('hparty').value.toLowerCase(),cat=$('hcat').value;
+ let list=[...db.entries].filter(e=>(!f||e.date>=f)&&(!t||e.date<=t)&&(!type||e.type===type)&&(!mode||(e.mode===mode||e.from===mode||e.to===mode))&&(!party||String(e.party||'').toLowerCase().includes(party))&&(!cat||e.category===cat)).sort((a,b)=>b.id-a.id);
+ $('historyList').innerHTML=list.length?list.map(e=>{
+  let title,amt,cls;
+  if(e.type==='income'){title=`Income • ${e.party||'No Party'} • ${e.category}`;amt='+ '+money(e.amount);cls='income'}
+  else if(e.type==='expense'){title=`Expense • ${e.party||'No Party'} • ${e.category}`;amt='- '+money(e.amount);cls='expense'}
+  else{title=`Transfer • ${e.party||'No Account'} • ${e.from} → ${e.to}`;amt=money(e.amount);cls='transfer'}
+  return `<div class="listitem"><div class="itemtop"><div><div class="itemtitle">${esc(title)}</div><div class="meta">${esc(e.date)}${e.ref?' • Ref: '+esc(e.ref):''}</div>${e.note?`<div class="meta">📝 ${esc(e.note)}</div>`:''}</div><div class="amount ${cls}">${amt}</div></div><button class="danger" style="margin-top:8px;padding:6px 9px" onclick="deleteEntry(${e.id})">Delete</button></div>`
+ }).join(''):'<div class="empty">No transactions found.</div>';
 }
-
-
-/* -------------------------
-   START
-------------------------- */
-
-updateDashboard();
-
+function deleteEntry(id){if(confirm('Delete this transaction?')){db.entries=db.entries.filter(e=>e.id!==id);save();updateDashboard();renderHistory();renderReports()}}
+function renderReports(){
+ const ym=$('reportMonth').value||today().slice(0,7),inc=monthSum('income',ym),exp=monthSum('expense',ym),tr=monthSum('transfer',ym);
+ $('rIncome').textContent=money(inc);$('rExpense').textContent=money(exp);$('rNet').textContent=money(inc-exp);$('rTransfer').textContent=money(tr);
+ const max=Math.max(inc,exp,1);$('inBar').style.width=(inc/max*100)+'%';$('outBar').style.width=(exp/max*100)+'%';
+ const cats={};db.entries.filter(e=>e.type==='expense'&&e.date.startsWith(ym)).forEach(e=>cats[e.category]=(cats[e.category]||0)+Number(e.amount));
+ const arr=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+ $('catReport').innerHTML=arr.length?arr.map(([c,v])=>`<div class="listitem"><div class="itemtop"><b>${esc(c)}</b><b class="expense">${money(v)}</b></div></div>`).join(''):'<div class="empty">No expense data.</div>';
+}
+$('reportMonth').addEventListener('change',renderReports);
+function renderMasters(){
+ $('partyMaster').innerHTML=db.parties.length?db.parties.map((p,i)=>`<div class="masterrow"><div class="mastername">${esc(p)}</div><div class="actions"><button onclick="editParty(${i})">✏️</button><button onclick="deleteParty(${i})">🗑️</button></div></div>`).join(''):'<div class="empty">No parties added.</div>';
+ $('categoryMaster').innerHTML=db.categories.length?db.categories.map((c,i)=>{const hidden=db.hiddenCategories.includes(c);return `<div class="masterrow"><div><div class="mastername">${esc(c)}</div>${hidden?'<span class="chip">Hidden</span>':''}</div><div class="actions"><button onclick="editCategory(${i})">✏️</button><button onclick="toggleCategory(${i})">${hidden?'👁️':'🙈'}</button><button onclick="deleteCategory(${i})">🗑️</button></div></div>`}).join(''):'<div class="empty">No categories.</div>';
+ fillCategories();fillParties();
+}
+function addParty(){const p=prompt('Party / Account name:');if(p&&p.trim()){db.parties.push(p.trim());save();renderMasters()}}
+function editParty(i){const p=prompt('Edit party name:',db.parties[i]);if(p&&p.trim()){db.parties[i]=p.trim();save();renderMasters()}}
+function deleteParty(i){if(confirm('Delete this party from Party Master? Existing transactions will remain.')){db.parties.splice(i,1);save();renderMasters()}}
+function addCategory(){const c=prompt('New Category / Head:');if(c&&c.trim()&&!db.categories.includes(c.trim())){db.categories.push(c.trim());save();renderMasters()}}
+function editCategory(i){const old=db.categories[i],c=prompt('Edit Category / Head:',old);if(c&&c.trim()){db.categories[i]=c.trim();db.hiddenCategories=db.hiddenCategories.map(x=>x===old?c.trim():x);save();renderMasters()}}
+function toggleCategory(i){const c=db.categories[i];if(db.hiddenCategories.includes(c))db.hiddenCategories=db.hiddenCategories.filter(x=>x!==c);else db.hiddenCategories.push(c);save();renderMasters()}
+function deleteCategory(i){const c=db.categories[i];if(confirm('Delete this category? Existing transactions will remain.')){db.categories.splice(i,1);db.hiddenCategories=db.hiddenCategories.filter(x=>x!==c);save();renderMasters()}}
+function saveOpening(){db.opening={date:$('openDate').value,cash:+$('openCash').value||0,online:+$('openOnline').value||0};save();updateDashboard();alert('Opening balance saved.')}
+function backupData(){
+ const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='daily-money-manager-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)
+}
+function restoreData(ev){
+ const file=ev.target.files[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.entries||!x.categories)throw Error();db=x;save();init();alert('Backup restored successfully.')}catch{alert('Invalid backup file.')}};r.readAsText(file)
+}
+function exportCSV(){
+ const rows=[['Date','Type','Party','Amount','Mode','From','To','Category','Reference','Note']];
+ db.entries.forEach(e=>rows.push([e.date,e.type,e.party||'',e.amount,e.mode||'',e.from||'',e.to||'',e.category||'',e.ref||'',e.note||'']));
+ const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='daily-money-manager-'+today()+'.csv';a.click();
+}
+function savePin(){const p=$('pinInput').value.trim();if(!/^\d{4}$/.test(p))return alert('Enter exactly 4 digits.');db.pin=p;save();$('pinInput').value='';alert('PIN saved.')}
+function removePin(){if(confirm('Remove App Lock?')){db.pin='';save();alert('PIN removed.')}} 
+function unlock(){if($('unlockPin').value===db.pin){$('pinModal').classList.remove('show');$('unlockPin').value=''}else alert('Wrong PIN.')}
+init();
 </script>
-
 </body>
 </html>
