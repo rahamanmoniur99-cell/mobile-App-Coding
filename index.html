@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<title>Daily Money Manager</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+header {
+    background: #0f172a;
+    color: white;
+    padding: 18px 16px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+header p {
+    margin: 5px 0 0;
+    font-size: 13px;
+    opacity: .8;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+    padding: 15px;
+}
+
+.balance-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.balance-card {
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.balance-card h3 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.balance-card .amount {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.cash {
+    color: #15803d;
+}
+
+.online {
+    color: #2563eb;
+}
+
+.total-card {
+    background: #16a34a;
+    color: white;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 15px;
+}
+
+.total-card h3 {
+    margin: 0 0 8px;
+    font-size: 14px;
+}
+
+.total-card .amount {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.card {
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.card h2 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.tabs button {
+    flex: 1;
+    border: none;
+    padding: 12px;
+    border-radius: 9px;
+    background: #e2e8f0;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.tabs button.active {
+    background: #0f172a;
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    font-size: 15px;
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: #2563eb;
+}
+
+.primary-btn {
+    width: 100%;
+    border: none;
+    padding: 13px;
+    border-radius: 9px;
+    background: #16a34a;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.transfer-btn {
+    background: #2563eb;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.summary-box {
+    padding: 14px;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.summary-box small {
+    color: #64748b;
+}
+
+.summary-box strong {
+    display: block;
+    margin-top: 5px;
+    font-size: 20px;
+}
+
+.income-text {
+    color: #16a34a;
+}
+
+.expense-text {
+    color: #dc2626;
+}
+
+.history-item {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 13px 0;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.history-title {
+    font-weight: bold;
+}
+
+.history-date {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.history-amount {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.delete-btn {
+    margin-top: 8px;
+    border: none;
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.empty {
+    text-align: center;
+    color: #64748b;
+    padding: 25px 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+.footer {
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+    padding: 20px;
+}
+
+@media (max-width: 500px) {
+    .balance-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .balance-card .amount {
+        font-size: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Daily Money Manager</h1>
+    <p>Income • Expense • Cash • Online</p>
+</header>
+
+<div class="container">
+
+    <!-- BALANCE -->
+    <div class="balance-grid">
+        <div class="balance-card">
+            <h3>Cash Balance</h3>
+            <div class="amount cash" id="cashBalance">₹0.00</div>
+        </div>
+
+        <div class="balance-card">
+            <h3>Online Balance</h3>
+            <div class="amount online" id="onlineBalance">₹0.00</div>
+        </div>
+    </div>
+
+    <div class="total-card">
+        <h3>Total Balance</h3>
+        <div class="amount" id="totalBalance">₹0.00</div>
+    </div>
+
+    <!-- ENTRY -->
+    <div class="card">
+        <div class="tabs">
+            <button id="incomeTab" class="active" onclick="setType('income')">
+                Income
+            </button>
+
+            <button id="expenseTab" onclick="setType('expense')">
+                Expense
+            </button>
+
+            <button id="transferTab" onclick="setType('transfer')">
+                Transfer
+            </button>
+        </div>
+
+        <!-- Income / Expense Form -->
+        <div id="normalForm">
+
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="date">
+            </div>
+
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="amount" placeholder="Enter amount" step="0.01">
+            </div>
+
+            <div class="form-group">
+                <label>Mode</label>
+                <select id="mode">
+                    <option value="cash">Cash</option>
+                    <option value="online">Online</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Category / Head</label>
+                <input type="text" id="category" placeholder="Example: Sale, Labour, Food">
+            </div>
+
+            <div class="form-group">
+                <label>Note</label>
+                <input type="text" id="note" placeholder="Optional">
+            </div>
+
+            <button class="primary-btn" onclick="addEntry()">
+                Add Entry
+            </button>
+        </div>
+
+        <!-- Transfer Form -->
+        <div id="transferForm" class="hidden">
+
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="transferDate">
+            </div>
+
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="transferAmount" placeholder="Enter amount">
+            </div>
+
+            <div class="form-group">
+                <label>From</label>
+                <select id="fromMode">
+                    <option value="cash">Cash</option>
+                    <option value="online">Online</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>To</label>
+                <select id="toMode">
+                    <option value="online">Online</option>
+                    <option value="cash">Cash</option>
+                </select>
+            </div>
+
+            <button class="primary-btn transfer-btn" onclick="addTransfer()">
+                Transfer Money
+            </button>
+        </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="card">
+        <h2>Summary</h2>
+
+        <div class="summary">
+            <div class="summary-box">
+                <small>Total Income</small>
+                <strong class="income-text" id="totalIncome">₹0.00</strong>
+            </div>
+
+            <div class="summary-box">
+                <small>Total Expense</small>
+                <strong class="expense-text" id="totalExpense">₹0.00</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="card">
+        <h2>History</h2>
+
+        <div class="form-group">
+            <label>Filter Date</label>
+            <input type="date" id="filterDate" onchange="renderHistory()">
+        </div>
+
+        <div id="history"></div>
+    </div>
+
+</div>
+
+<div class="footer">
+    Daily Money Manager
+</div>
+
+<script>
+
+let entries = JSON.parse(localStorage.getItem("moneyEntries")) || [];
+
+let currentType = "income";
+
+const today = new Date().toISOString().split("T")[0];
+
+document.getElementById("date").value = today;
+document.getElementById("transferDate").value = today;
+
+
+/* -------------------------
+   TYPE
+------------------------- */
+
+function setType(type) {
+
+    currentType = type;
+
+    document.getElementById("incomeTab").classList.remove("active");
+    document.getElementById("expenseTab").classList.remove("active");
+    document.getElementById("transferTab").classList.remove("active");
+
+    document.getElementById(type + "Tab").classList.add("active");
+
+    if (type === "transfer") {
+
+        document.getElementById("normalForm").classList.add("hidden");
+        document.getElementById("transferForm").classList.remove("hidden");
+
+    } else {
+
+        document.getElementById("normalForm").classList.remove("hidden");
+        document.getElementById("transferForm").classList.add("hidden");
+    }
+}
+
+
+/* -------------------------
+   ADD INCOME / EXPENSE
+------------------------- */
+
+function addEntry() {
+
+    const date = document.getElementById("date").value;
+    const amount = parseFloat(document.getElementById("amount").value);
+    const mode = document.getElementById("mode").value;
+    const category = document.getElementById("category").value.trim();
+    const note = document.getElementById("note").value.trim();
+
+    if (!date) {
+        alert("Please select date.");
+        return;
+    }
+
+    if (!amount || amount <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+    }
+
+    entries.push({
+        id: Date.now(),
+        type: currentType,
+        date: date,
+        amount: amount,
+        mode: mode,
+        category: category || "General",
+        note: note
+    });
+
+    saveData();
+
+    document.getElementById("amount").value = "";
+    document.getElementById("category").value = "";
+    document.getElementById("note").value = "";
+
+    updateDashboard();
+
+    alert(
+        currentType === "income"
+        ? "Income added successfully."
+        : "Expense added successfully."
+    );
+}
+
+
+/* -------------------------
+   TRANSFER
+------------------------- */
+
+function addTransfer() {
+
+    const date = document.getElementById("transferDate").value;
+    const amount = parseFloat(
+        document.getElementById("transferAmount").value
+    );
+
+    const from = document.getElementById("fromMode").value;
+    const to = document.getElementById("toMode").value;
+
+    if (!amount || amount <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+    }
+
+    if (from === to) {
+        alert("From and To cannot be same.");
+        return;
+    }
+
+    entries.push({
+        id: Date.now(),
+        type: "transfer",
+        date: date,
+        amount: amount,
+        from: from,
+        to: to
+    });
+
+    saveData();
+
+    document.getElementById("transferAmount").value = "";
+
+    updateDashboard();
+
+    alert("Transfer completed.");
+}
+
+
+/* -------------------------
+   SAVE
+------------------------- */
+
+function saveData() {
+    localStorage.setItem("moneyEntries", JSON.stringify(entries));
+}
+
+
+/* -------------------------
+   CALCULATE BALANCE
+------------------------- */
+
+function calculateBalances() {
+
+    let cash = 0;
+    let online = 0;
+
+    let income = 0;
+    let expense = 0;
+
+    entries.forEach(entry => {
+
+        if (entry.type === "income") {
+
+            if (entry.mode === "cash") {
+                cash += entry.amount;
+            } else {
+                online += entry.amount;
+            }
+
+            income += entry.amount;
+        }
+
+        if (entry.type === "expense") {
+
+            if (entry.mode === "cash") {
+                cash -= entry.amount;
+            } else {
+                online -= entry.amount;
+            }
+
+            expense += entry.amount;
+        }
+
+        if (entry.type === "transfer") {
+
+            if (entry.from === "cash") {
+                cash -= entry.amount;
+            } else {
+                online -= entry.amount;
+            }
+
+            if (entry.to === "cash") {
+                cash += entry.amount;
+            } else {
+                online += entry.amount;
+            }
+        }
+    });
+
+    return {
+        cash,
+        online,
+        total: cash + online,
+        income,
+        expense
+    };
+}
+
+
+/* -------------------------
+   DASHBOARD
+------------------------- */
+
+function updateDashboard() {
+
+    const data = calculateBalances();
+
+    document.getElementById("cashBalance").textContent =
+        formatMoney(data.cash);
+
+    document.getElementById("onlineBalance").textContent =
+        formatMoney(data.online);
+
+    document.getElementById("totalBalance").textContent =
+        formatMoney(data.total);
+
+    document.getElementById("totalIncome").textContent =
+        formatMoney(data.income);
+
+    document.getElementById("totalExpense").textContent =
+        formatMoney(data.expense);
+
+    renderHistory();
+}
+
+
+/* -------------------------
+   HISTORY
+------------------------- */
+
+function renderHistory() {
+
+    const container = document.getElementById("history");
+
+    const filterDate =
+        document.getElementById("filterDate").value;
+
+    let list = [...entries];
+
+    if (filterDate) {
+        list = list.filter(item => item.date === filterDate);
+    }
+
+    list.sort((a,b) => {
+        return b.id - a.id;
+    });
+
+    if (list.length === 0) {
+        container.innerHTML =
+            '<div class="empty">No entries found.</div>';
+        return;
+    }
+
+    container.innerHTML = "";
+
+    list.forEach(entry => {
+
+        const div = document.createElement("div");
+        div.className = "history-item";
+
+        let title = "";
+        let amountText = "";
+        let amountClass = "";
+
+        if (entry.type === "income") {
+
+            title =
+                "Income • " +
+                (entry.category || "General") +
+                " • " +
+                capitalize(entry.mode);
+
+            amountText = "+ " + formatMoney(entry.amount);
+            amountClass = "income-text";
+
+        } else if (entry.type === "expense") {
+
+            title =
+                "Expense • " +
+                (entry.category || "General") +
+                " • " +
+                capitalize(entry.mode);
+
+            amountText = "- " + formatMoney(entry.amount);
+            amountClass = "expense-text";
+
+        } else {
+
+            title =
+                "Transfer • " +
+                capitalize(entry.from) +
+                " → " +
+                capitalize(entry.to);
+
+            amountText = formatMoney(entry.amount);
+            amountClass = "online";
+        }
+
+        div.innerHTML = `
+            <div class="history-top">
+                <div>
+                    <div class="history-title">${escapeHTML(title)}</div>
+                    <div class="history-date">
+                        ${entry.date}
+                        ${entry.note ? " • " + escapeHTML(entry.note) : ""}
+                    </div>
+                </div>
+
+                <div class="history-amount ${amountClass}">
+                    ${amountText}
+                </div>
+            </div>
+
+            <button class="delete-btn"
+                onclick="deleteEntry(${entry.id})">
+                Delete
+            </button>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+
+/* -------------------------
+   DELETE
+------------------------- */
+
+function deleteEntry(id) {
+
+    const ok = confirm("Delete this entry?");
+
+    if (!ok) return;
+
+    entries = entries.filter(entry => entry.id !== id);
+
+    saveData();
+
+    updateDashboard();
+}
+
+
+/* -------------------------
+   HELPERS
+------------------------- */
+
+function formatMoney(value) {
+
+    return "₹" + Number(value).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function capitalize(text) {
+
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function escapeHTML(text) {
+
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* -------------------------
+   START
+------------------------- */
+
+updateDashboard();
+
+</script>
+
+</body>
+</html>
