@@ -18,7 +18,10 @@ h3{font-size:15px;margin:16px 3px 10px}.summary{display:grid;grid-template-colum
 .nav{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);height:72px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid #edf0f4;display:flex;align-items:center;justify-content:space-around}.nav button{border:0;background:none;color:#777d89;font-size:22px;display:flex;flex-direction:column;align-items:center;gap:2px}.nav button span{font-size:10px}.nav .active{color:#2459df}.fab{width:58px!important;height:58px;border-radius:50%!important;background:#2a5fe0!important;color:#fff!important;font-size:38px!important;line-height:58px;box-shadow:0 9px 20px rgba(38,91,222,.35);margin-top:-24px}
 .overlay{position:fixed;z-index:50;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center}.hidden{display:none}.sheet{width:min(430px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:25px 25px 0 0;padding:18px}.sheet h2{font-size:18px;text-align:center;margin:0 0 15px}.close{float:right;border:0;background:#f0f2f5;border-radius:50%;width:30px;height:30px}.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.action{border:0;background:#f7f8fb;border-radius:16px;padding:15px 7px;font-weight:700}.action i{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;color:#fff;font-style:normal;font-size:26px;margin:0 auto 8px}.action.in i{background:var(--green)}.action.out i{background:var(--red)}.action.tr i{background:var(--blue)}.field{margin:11px 0}.field label{display:block;font-size:11px;font-weight:700;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid #e1e4eb;border-radius:12px;padding:12px;outline:none;background:#fff}.field textarea{min-height:65px;resize:vertical}.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}.modes button{padding:11px;border:1px solid #ddd;border-radius:11px;background:#fff}.modes button.sel{background:var(--green);color:#fff;border-color:var(--green)}.expense .modes button.sel{background:var(--red);border-color:var(--red)}.save{width:100%;border:0;border-radius:12px;padding:14px;color:#fff;font-weight:800;background:var(--green)}.save.expense{background:var(--red)}.save.transfer{background:var(--blue)}
 .page-title{font-size:20px;font-weight:800;margin:8px 0 14px}.reportbox{border-radius:16px;background:#f7f9ff;padding:15px;margin:10px 0}.reportbox b{font-size:14px}.reportbox p{font-size:13px;margin:9px 0}.filters{display:flex;gap:7px;overflow:auto;margin-bottom:12px}.filters button{white-space:nowrap;border:1px solid #ddd;background:#fff;border-radius:16px;padding:7px 12px;font-size:11px}.filters .sel{background:var(--blue);color:#fff;border-color:var(--blue)}.morebtn{padding:10px 13px;border:1px solid #dce1eb;border-radius:10px;background:#fff;margin-right:5px}
-</style>
+
+.searchbox{display:flex;align-items:center;gap:7px;margin:8px 0}.searchbox input{flex:1;border:1px solid #e1e4eb;border-radius:11px;padding:10px}.searchbox span{font-size:14px;color:#7b818d}
+.masterpick{display:flex;align-items:center;gap:8px}.masterpick select{flex:1}
+
 </head>
 <body>
 <div class="app">
@@ -32,7 +35,7 @@ h3{font-size:15px;margin:16px 3px 10px}.summary{display:grid;grid-template-colum
 <div class="overlay hidden" id="overlay"><div class="sheet" id="sheet"></div></div>
 <script>
 const K="mobile_money_final_v2";let s=JSON.parse(localStorage.getItem(K)||'{"cash":0,"online":0,"hidden":false,"tx":[],"parties":[],"categories":[]}');
-s.parties=s.parties||[];s.categories=s.categories||[];
+s.parties=s.parties||[];s.categories=s.categories||[];s.recycle=s.recycle||[];s.password=s.password||"";s.business=s.business||{name:"A1 Plastic Industries",domain:"",website:"",email:"",mobile:"",address:"",city:"",district:"",state:"",pin:"",gstin:"",pan:"",type:"",logo:""};
 const $=x=>document.querySelector(x), money=n=>"₹ "+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2}), today=()=>new Date().toISOString().slice(0,10);
 function save(){localStorage.setItem(K,JSON.stringify(s));render()}function closeSheet(){$("#overlay").classList.add("hidden")}function openSheet(x){$("#sheet").innerHTML=x;$("#overlay").classList.remove("hidden")}
 function render(){let i=0,e=0;s.tx.forEach(t=>{if(t.date===today()){if(t.type==="in")i+=t.amount;if(t.type==="out")e+=t.amount}});let total=s.cash+s.online;$("#total").textContent=s.hidden?"₹ ••••••":money(total);$("#cash").textContent=s.hidden?"₹ ••••••":money(s.cash);$("#online").textContent=s.hidden?"₹ ••••••":money(s.online);$("#income").textContent=money(i);$("#expense").textContent=money(e);$("#net").textContent=money(i-e);let a=s.tx.slice(0,6),l=$("#list");l.innerHTML=a.length?a.map(t=>`<div class="tx"><div class="txicon ${t.type}">${t.type==="in"?"↑":t.type==="out"?"↓":"⇄"}</div><div class="txmain"><b>${esc(t.title)}</b><small>${esc(t.mode||"")} · ${t.time||""}</small></div><div class="amt ${t.type}">${t.type==="in"?"+":t.type==="out"?"-":"⇄"} ${money(t.amount)}</div></div>`).join(""):'<div class="empty">No transactions yet.<br>Tap + to add Income, Expense or Transfer.</div>'}
@@ -42,20 +45,20 @@ function chooser(){openSheet(`<button class="close" onclick="closeSheet()">×</b
 let mode="Cash";
 function incomeForm(){ openEntryForm("in"); }
 function expenseForm(){ openEntryForm("out"); }
-function openEntryForm(type){mode="Cash";openSheet(`<button class="close" onclick="closeSheet()">×</button><h2>${type==="in"?"Add Income":"Add Expense"}</h2><div class="field"><label>Amount</label><input id="amt" type="number" min="0" step="0.01" placeholder="0.00"></div><div class="field"><label>Party (Optional)</label><select id="party"><option value="">Select Party</option></select></div><div class="field"><label>Category / Head</label><select id="cat"><option value="">Select Category</option></select></div><div class="field"><label>Mode</label><div class="modes"><button id="cashM" class="sel" onclick="pick('Cash')">Cash</button><button id="onlineM" onclick="pick('Online')">Online</button></div></div><div class="field"><label>Note (Optional)</label><textarea id="note" placeholder="Add note here..."></textarea></div><button class="save ${type==="out"?"expense":""}" onclick="submit('${type}')">Save ${type==="in"?"Income":"Expense"}</button>`);populateMasters()}
+function openEntryForm(type){mode="Cash";openSheet(`<button class="close" onclick="closeSheet()">×</button><h2>${type==="in"?"Add Income":"Add Expense"}</h2><div class="field"><label>Amount</label><input id="amt" type="number" min="0" step="0.01" placeholder="0.00"></div><div class="field"><label>Party (Optional)</label><input id="party" list="partyOptions" placeholder="Search / Select Party"><datalist id="partyOptions"></datalist></div><div class="field"><label>Category / Head</label><input id="cat" list="catOptions" placeholder="Search / Select Category"><datalist id="catOptions"></datalist></div><div class="field"><label>Mode</label><div class="modes"><button id="cashM" class="sel" onclick="pick('Cash')">Cash</button><button id="onlineM" onclick="pick('Online')">Online</button></div></div><div class="field"><label>Note (Optional)</label><textarea id="note" placeholder="Add note here..."></textarea></div><button class="save ${type==="out"?"expense":""}" onclick="submit('${type}')">Save ${type==="in"?"Income":"Expense"}</button>`);populateMasters()}
 function pick(x){mode=x;$("#cashM").classList.toggle("sel",x==="Cash");$("#onlineM").classList.toggle("sel",x==="Online")}
 function submit(type){let a=+$("#amt").value;if(!a||a<0)return alert("Please enter an amount.");let k=mode.toLowerCase();if(type==="out"&&s[k]<a)return alert("Insufficient "+mode+" balance.");s[k]+=type==="in"?a:-a;s.tx.unshift({type,amount:a,mode,date:today(),time:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}),title:$("#party").value||$("#cat").value||(type==="in"?"Income":"Expense"),note:$("#note").value});save();closeSheet()}
 function transfer(){openSheet(`<button class="close" onclick="closeSheet()">×</button><h2>Add Transfer</h2><div class="field"><label>Amount</label><input id="tamt" type="number" min="0" step="0.01" placeholder="0.00"></div><div class="field"><label>From</label><select id="from"><option>Cash</option><option>Online</option></select></div><div class="field"><label>To</label><select id="to"><option>Online</option><option>Cash</option></select></div><div class="field"><label>Note (Optional)</label><textarea id="tnote" placeholder="Add note here..."></textarea></div><button class="save transfer" onclick="submitTransfer()">Transfer Now</button>`)}
 function submitTransfer(){let a=+$("#tamt").value,f=$("#from").value,t=$("#to").value;if(!a||a<0)return alert("Please enter an amount.");if(f===t)return alert("From and To must be different.");if(s[f.toLowerCase()]<a)return alert("Insufficient "+f+" balance.");s[f.toLowerCase()]-=a;s[t.toLowerCase()]+=a;s.tx.unshift({type:"tr",amount:a,mode:f+" → "+t,date:today(),time:new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}),title:"Transfer to "+t,note:$("#tnote").value});save();closeSheet()}
 function populateMasters(){
- const p=$("#party"),c=$("#cat"); if(!p||!c)return;
- p.innerHTML='<option value="">Select Party</option>'+s.parties.map(x=>`<option>${esc(x)}</option>`).join("");
- c.innerHTML='<option value="">Select Category</option>'+s.categories.map(x=>`<option>${esc(x)}</option>`).join("");
+ const p=$("#partyOptions"),c=$("#catOptions"); if(!p||!c)return;
+ p.innerHTML=s.parties.map(x=>`<option value="${esc(x)}"></option>`).join("");
+ c.innerHTML=s.categories.map(x=>`<option value="${esc(x)}"></option>`).join("");
 }
 function masters(){
  openSheet(`<button class="close" onclick="closeSheet()">×</button><div class="page-title">Party & Category Master</div>
- <div class="reportbox"><b>Party Master</b><p>Add the parties you use in Income / Expense entries.</p><button class="morebtn" onclick="addParty()">+ Add Party</button><div id="partyMasterList">${masterList("party")}</div></div>
- <div class="reportbox"><b>Category / Head Master</b><p>Keep your regular Income / Expense heads here.</p><button class="morebtn" onclick="addCategory()">+ Add Category</button><div id="catMasterList">${masterList("category")}</div></div>`);
+ <div class="reportbox"><b>Party Master</b><p>Search by typing when selecting a Party.</p><button class="morebtn" onclick="addParty()">+ Add Party</button><div id="partyMasterList">${masterList("party")}</div></div>
+ <div class="reportbox"><b>Category / Head Master</b><p>Search by typing when selecting a Category / Head.</p><button class="morebtn" onclick="addCategory()">+ Add Category</button><div id="catMasterList">${masterList("category")}</div></div>`);
 }
 function masterList(kind){
  const arr=kind==="party"?s.parties:s.categories;
@@ -65,9 +68,63 @@ function masterList(kind){
 function addParty(){let x=prompt("Enter Party Name");if(x&&x.trim()){x=x.trim();if(!s.parties.includes(x))s.parties.push(x);save();masters()}}
 function addCategory(){let x=prompt("Enter Category / Head");if(x&&x.trim()){x=x.trim();if(!s.categories.includes(x))s.categories.push(x);save();masters()}}
 function removeMaster(kind,i){if(confirm("Delete this name from Master?")){(kind==="party"?s.parties:s.categories).splice(i,1);save();masters()}}
+
+function askPassword(action){
+ if(!s.password){let p=prompt("Set your App Password first:");if(!p)return false;s.password=p;save();alert("App Password set.");return true}
+ let p=prompt("Enter App Password:"); if(p!==s.password){alert("Incorrect password.");return false} return true;
+}
+function recycleItem(type,index){
+ if(!askPassword("delete"))return;
+ const arr=type==="party"?s.parties:s.categories; const value=arr.splice(index,1)[0];
+ s.recycle.unshift({kind:type,value,deletedAt:new Date().toLocaleString("en-IN")});save();masters();
+}
+function recycleBin(){
+ if(!askPassword("recycle"))return;
+ openSheet(`<button class="close" onclick="closeSheet()">×</button><div class="page-title">Recycle Bin</div>
+ ${s.recycle.length?s.recycle.map((x,i)=>`<div class="tx"><div class="txicon tr">↺</div><div class="txmain"><b>${esc(x.value)}</b><small>${esc(x.kind)} · ${esc(x.deletedAt)}</small></div><button class="morebtn" onclick="restoreRecycle(${i})">Restore</button><button class="morebtn" onclick="permanentDelete(${i})">Delete</button></div>`).join(""):'<div class="empty">Recycle Bin is empty.</div>'}`);
+}
+function restoreRecycle(i){
+ if(!askPassword("restore"))return;let x=s.recycle[i];
+ if(x.kind==="party"&&!s.parties.includes(x.value))s.parties.push(x.value);
+ if(x.kind==="category"&&!s.categories.includes(x.value))s.categories.push(x.value);
+ s.recycle.splice(i,1);save();recycleBin();
+}
+function permanentDelete(i){if(!askPassword("permanent delete"))return;s.recycle.splice(i,1);save();recycleBin()}
+function addParty(){let x=prompt("Enter Party Name");if(x&&x.trim()){x=x.trim();if(!s.parties.includes(x))s.parties.push(x);save();masters()}}
+function addCategory(){let x=prompt("Enter Category / Head");if(x&&x.trim()){x=x.trim();if(!s.categories.includes(x))s.categories.push(x);save();masters()}}
+function removeMaster(kind,i){recycleItem(kind,i)}
+function businessProfile(){
+ const b=s.business;
+ openSheet(`<button class="close" onclick="closeSheet()">×</button><div class="page-title">Business Profile</div>
+ <div class="field"><label>Business Name</label><input id="bn" value="${esc(b.name)}"></div>
+ <div class="field"><label>Business Domain</label><input id="bd" value="${esc(b.domain)}" placeholder="a1plastic.in"></div>
+ <div class="field"><label>Business Website</label><input id="bw" value="${esc(b.website)}" placeholder="https://..."></div>
+ <div class="field"><label>Business Email</label><input id="be" value="${esc(b.email)}"></div>
+ <div class="field"><label>Mobile Number</label><input id="bm" value="${esc(b.mobile)}"></div>
+ <div class="field"><label>Full Address</label><textarea id="ba">${esc(b.address)}</textarea></div>
+ <div class="field"><label>City</label><input id="bc" value="${esc(b.city)}"></div>
+ <div class="field"><label>District</label><input id="bdi" value="${esc(b.district)}"></div>
+ <div class="field"><label>State</label><input id="bs" value="${esc(b.state)}"></div>
+ <div class="field"><label>PIN Code</label><input id="bp" value="${esc(b.pin)}"></div>
+ <div class="field"><label>GSTIN (Optional)</label><input id="bg" value="${esc(b.gstin)}"></div>
+ <div class="field"><label>PAN (Optional)</label><input id="bpan" value="${esc(b.pan)}"></div>
+ <div class="field"><label>Business Type</label><input id="bt" value="${esc(b.type)}"></div>
+ <button class="save" onclick="saveBusiness()">Save Business Profile</button>`);
+}
+function saveBusiness(){
+ s.business={name:$("#bn").value,domain:$("#bd").value,website:$("#bw").value,email:$("#be").value,mobile:$("#bm").value,address:$("#ba").value,city:$("#bc").value,district:$("#bdi").value,state:$("#bs").value,pin:$("#bp").value,gstin:$("#bg").value,pan:$("#bpan").value,type:$("#bt").value,logo:s.business.logo||""};
+ save();closeSheet();
+}
+function passwordSettings(){
+ openSheet(`<button class="close" onclick="closeSheet()">×</button><div class="page-title">App Password</div>
+ <div class="reportbox"><b>${s.password?"Password is set":"No password is set"}</b><p>${s.password?"Change the password used for Delete, Restore and Recycle Bin actions.":"Set a password to protect delete and recycle actions."}</p></div>
+ <div class="field"><label>${s.password?"New Password":"Create Password"}</label><input id="newpass" type="password" placeholder="Enter password"></div>
+ <button class="save" onclick="setPassword()">Save Password</button>`);
+}
+function setPassword(){let p=$("#newpass").value.trim();if(p.length<4)return alert("Use at least 4 characters.");s.password=p;save();closeSheet();alert("App Password saved.");}
 function historyPage(){openSheet(`<button class="close" onclick="closeSheet()">×</button><div class="page-title">History</div>${s.tx.length?s.tx.map(t=>`<div class="tx"><div class="txicon ${t.type}">${t.type==="in"?"↑":t.type==="out"?"↓":"⇄"}</div><div class="txmain"><b>${esc(t.title)}</b><small>${t.date} · ${esc(t.mode||"")}</small></div><div class="amt ${t.type}">${t.type==="in"?"+":t.type==="out"?"-":"⇄"} ${money(t.amount)}</div></div>`).join(""):'<div class="empty">No transactions yet.</div>'}`)}
 function reports(){let i=0,e=0;s.tx.forEach(t=>t.type==="in"?i+=t.amount:t.type==="out"?e+=t.amount:0);openSheet(`<button class="close" onclick="closeSheet()">×</button><div class="page-title">Reports</div><div class="filters"><button class="sel">Today</button><button>Week</button><button>Month</button><button>Year</button><button>Custom</button></div><div class="reportbox"><b>Monthly Summary</b><p>Income: ${money(i)}</p><p>Expense: ${money(e)}</p><p>Net: ${money(i-e)}</p></div><div class="reportbox"><b>Cash / Online Summary</b><p>Cash: ${money(s.cash)}</p><p>Online: ${money(s.online)}</p></div>`)}
-function more(){openSheet(`<button class="close" onclick="closeSheet()">×</button><div class="page-title">More</div><div class="reportbox"><b>Masters</b><p>Manage Party and Category / Head names.</p><button class="morebtn" onclick="masters()">Party & Category Master</button></div><div class="reportbox"><b>Backup & Restore</b><p>Your data stays on this device.</p><button class="morebtn" onclick="backup()">Backup</button><button class="morebtn" onclick="restore()">Restore</button></div><div class="reportbox"><b>Export</b><p><button class="morebtn" onclick="csv()">Export CSV</button></p></div><div class="reportbox"><b>Reset App</b><p><button class="morebtn" onclick="resetApp()">Reset all data</button></p></div>`)}
+function more(){openSheet(`<button class="close" onclick="closeSheet()">×</button><div class="page-title">More</div><div class="reportbox"><b>Masters</b><p>Manage Party and Category / Head names.</p><button class="morebtn" onclick="masters()">Party & Category Master</button></div><div class="reportbox"><b>Business Profile</b><p>Your business details for future reports and invoices.</p><button class="morebtn" onclick="businessProfile()">Business Profile</button></div><div class="reportbox"><b>Security</b><p>Protect delete and recycle actions.</p><button class="morebtn" onclick="passwordSettings()">App Password</button><button class="morebtn" onclick="recycleBin()">Recycle Bin</button></div><div class="reportbox"><b>Backup & Restore</b><p>Your data stays on this device.</p><button class="morebtn" onclick="backup()">Backup</button><button class="morebtn" onclick="restore()">Restore</button></div><div class="reportbox"><b>Export</b><p><button class="morebtn" onclick="csv()">Export CSV</button></p></div><div class="reportbox"><b>Reset App</b><p><button class="morebtn" onclick="resetApp()">Reset all data</button></p></div>`)}
 function home(){closeSheet();render()}function backup(){let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(s)],{type:"application/json"}));a.download="money-app-backup.json";a.click()}function restore(){let i=document.createElement("input");i.type="file";i.accept=".json";i.onchange=()=>{let r=new FileReader();r.onload=()=>{try{s=JSON.parse(r.result);save();closeSheet()}catch(e){alert("Invalid backup")}};r.readAsText(i.files[0])};i.click()}function csv(){let rows=[["Date","Time","Type","Title","Mode","Amount"],...s.tx.map(t=>[t.date,t.time,t.type,t.title,t.mode,t.amount])];let c=rows.map(r=>r.map(x=>`"${String(x??"").replaceAll('"','""')}"`).join(",")).join("\\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([c],{type:"text/csv"}));a.download="transactions.csv";a.click()}function resetApp(){if(confirm("Reset all app data?")){s={cash:0,online:0,hidden:false,tx:[]};save();closeSheet()}}
 render();
 </script>
