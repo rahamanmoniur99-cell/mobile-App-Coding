@@ -1,0 +1,11 @@
+{
+  "name": "Mobile App",
+  "short_name": "Mobile App",
+  "description": "A1 Plastic Industries daily money management app",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f5bd3",
+  "orientation": "portrait"
+}
